@@ -4,7 +4,7 @@ date: 2017-08-21 17:11:10
 tags:
     - ThreadLocal
 categories:
-    - Java并发
+    - Java
 ---
 近期看Java并发编程，总是会提到ThreadLocal，介绍时只是轻描淡写的说可以理解为一个< Thread, Value>的Map，但实际上并不是这样实现的，于是就一直想看看ThreadLocal在JDK中到底是如何实现的。大概看了一下源码中一些比较重要的类和方法，基本上了解了实现原理。
 <!--more-->

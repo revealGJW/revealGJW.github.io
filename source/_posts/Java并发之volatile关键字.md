@@ -5,7 +5,7 @@ tags:
   - Java
   - volatile
 categories:
-  - Java并发
+  - Java
 ---
 ## 定义
 volatile是Java并发编程中的一个关键字，可以用来修饰变量。被它所修饰的变量，会拥有可见性以及原子性(针对单一读写而言)。
