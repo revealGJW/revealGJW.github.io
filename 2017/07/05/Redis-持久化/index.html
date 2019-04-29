@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="GJW的个人博客"><title>Redis-持久化 | Reveal The Essence.</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script><link rel="icon" mask sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Redis-持久化</h1><a id="logo" href="/.">Reveal The Essence.</a><p class="description">保持信心, 正视自己, 持续努力.</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">Redis-持久化</h1><div class="post-meta">Jul 5, 2017<span> | </span><span class="category"><a href="/categories/数据库/">数据库</a></span></div><div class="post-content"><p>Redis是一个键值对数据库服务器，服务器中通常包含着任意个非空数据库，而每个非空数据库中又可以包含任意个键值对，为了方便起见，我们将服务器中的非空数据库以及它们的键值对统称为数据库状态。</p>
+<p>Redis是内存数据库，它将自己的数据库状态存储在内存里面，如果服务器进程退出，那么服务器中的数据库状态也会消失不见。为了解决这个问题，Redis提供了持久化功能，这个功能可以将Redis在内存中的数据库状态保存到磁盘里面，避免数据意外丢失。<br><a id="more"></a></p>
+<h2 id="RDB持久化"><a href="#RDB持久化" class="headerlink" title="RDB持久化"></a>RDB持久化</h2><p>RDB(快照)持久化既可以手动执行，也可以根据服务器配置选择定期执行，该功能可以将某个时间点上的数据库状态保存到一个RDB文件中。</p>
+<p>RDB持久化生成的RDB文件是一个经过压缩的二进制文件，可以使用这个文件还原生成RDB时的数据库状态。</p>
+<h3 id="RDB文件的创建与载入"><a href="#RDB文件的创建与载入" class="headerlink" title="RDB文件的创建与载入"></a>RDB文件的创建与载入</h3><p>SAVE、BGSAVE都可以用于生成RDB文件。</p>
+<p>SAVE命令会阻塞Redis服务器进程，直到RDB文件创建完毕，在服务器进程阻塞期间，服务器不能处理任何命令请求。</p>
+<p>BGSAVE命令会派生出一个子进程，然后由子进程负责创建RDB文件，服务器进程(父进程)继续处理命令请求。</p>
+<p>RDB文件的载入工作实在服务器启动时自动执行的。因为AOF文件的更新频率通常比RDB文件的更新频率高，所以：</p>
+<ul>
+<li>如果服务器开启了AOF持久化功能，那么服务期会优先使用AOF文件来还原数据库状态；</li>
+<li>如果AOF为关闭状态，则使用RDB还原数据库状态。</li>
+</ul>
+<p>服务器在RDB载入期间，会一直处于阻塞状态，直到载入工作完成为止。</p>
+<h3 id="自动间隔性保存"><a href="#自动间隔性保存" class="headerlink" title="自动间隔性保存"></a>自动间隔性保存</h3><p>SAVE命令由服务器进程执行保存工作，BGSAVE命令则由子进程执行保存工作。因为BGSAVE不阻塞服务器进程，所以Redis允许用户通过设置服务器配置的save选项，让服务器每隔一段时间自动执行一次BGSAVE命令。<br>例如下列配置：<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">save <span class="number">900</span> <span class="number">1</span></span><br><span class="line">save <span class="number">300</span> <span class="number">10</span></span><br><span class="line">save <span class="number">600</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure></p>
+<p>上述第一个参数值为时间间隔，第二个值为操作次数。也就是说在900秒内有一次以上修改，就进行保存。条件之间为或关系。</p>
+<p>服务器结构中有一个saveparam属性保存保存条件，还维持了一个dirty计数器和lastsave属性；dirty保存上次保存命令后执行的修改次数，lastsave保存上次保存命令的时间，服务器通过对比这两个属性和saveparam中的值来决定是否进行保存指令。</p>
+<h3 id="RDB文件结构"><a href="#RDB文件结构" class="headerlink" title="RDB文件结构"></a>RDB文件结构</h3><table>
+<thead>
+<tr>
+<th>REDIS</th>
+<th>db_version</th>
+<th>database</th>
+<th>EOF</th>
+<th>check_sum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>database 部分包含了零个或多个数据库，以及各个数据库中的键值对数据。</p>
+<p>check_sum是一个8字节长的无符号整数，保存着一个校验和，载入时会检查计算的检验和和这个属性是否相等，以此检查文件是否损坏。</p>
+<p>RDB文件中保存数据库每个键值对的过期时间(如果有的话)、类型、键、值。</p>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>RDB文件是一个很简洁的单文件，它保存了某个时间点的Redis数据，很适合用于做备份。你可以设定一个时间点对RDB文件进行归档，这样就能在需要的时候很轻易的把数据恢复到不同的版本。</li>
+<li>基于上面所描述的特性，RDB很适合用于灾备。单文件很方便就能传输到远程的服务器上。</li>
+<li>RDB的性能很好，需要进行持久化时，主进程会fork一个子进程出来，然后把持久化的工作交给子进程，自己不会有相关的I/O操作。</li>
+<li>比起AOF，在数据量比较大的情况下，RDB的启动速度更快。</li>
+</ul>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>RDB容易造成数据的丢失。假设每5分钟保存一次快照，如果Redis因为某些原因不能正常工作，那么从上次产生快照到Redis出现问题这段时间的数据就会丢失了。</li>
+<li>RDB使用fork()产生子进程进行数据的持久化，如果数据比较大的话可能就会花费点时间，造成Redis停止服务几毫秒。如果数据量很大且CPU性能不是很好的时候，停止服务的时间甚至会到1秒。</li>
+</ul>
+<h2 id="AOF持久化"><a href="#AOF持久化" class="headerlink" title="AOF持久化"></a>AOF持久化</h2><p>AOF(命令追加)持久化是通过保存Redis服务器所执行的写命令来记录数据库状态的。</p>
+<h3 id="AOF持久化的实现"><a href="#AOF持久化的实现" class="headerlink" title="AOF持久化的实现"></a>AOF持久化的实现</h3><p>AOF持久化功能的实现可分为命令追加、文件写入、文件同步三个步骤。</p>
+<p>当AOF是打开状态时，服务器在执行完一个写命令之后，会一写一个时将这条命令追加到服务器状态的aof_buf缓冲区的末尾。这一步骤即为命令追加。</p>
+<p>在计算机中，为了提高效率，写入操作通常不会直接写到磁盘中，而是写到内存的缓冲区中，等到缓冲区满或者超过指定时限后才将缓冲区中的内容写入磁盘。Redis中同样如此，因此使用一个属性appendfsync来描述将缓冲区中内容同步到AOF文件的时限。</p>
+<p>当appendfsync的值为always时，服务器的每个事件都要将aof_buf中的内容写入AOF文件，因此最为安全，但效率也最低。</p>
+<p>当appendfsync的值为everysec时，每个事件循环完成后，每隔一秒就将缓冲区中内容同步至AOF文件。</p>
+<p>当appendfsync为no时，何时同步由操作系统控制。</p>
+<h3 id="AOF的载入与数据还原"><a href="#AOF的载入与数据还原" class="headerlink" title="AOF的载入与数据还原"></a>AOF的载入与数据还原</h3><p>AOF中保存了重建数据库状态所需的所有写命令，所以只要重新执行一遍就可还原数据库状态。具体步骤如下：</p>
+<ul>
+<li>创建一个不带网络连接的伪客户端</li>
+<li>从AOF中分析并读取一条写命令</li>
+<li>使用伪客户端执行被读出的写命令。</li>
+<li>重复执行知道处理完</li>
+</ul>
+<h3 id="AOF重写"><a href="#AOF重写" class="headerlink" title="AOF重写"></a>AOF重写</h3><p>为了防止AOF文件由于时间流逝而保存了越来越多的内容，Redis提供了重写功能。通过该功能，Redis可以创建一个新的AOF文件来代替现有文件，新旧文件保存的数据库状态相同，但新的AOF文件不会包含冗余命令，所以体积会小许多。</p>
+<p>AOF实现重写的原理是首先从数据库中读取现在的值，然后用一条命令去记录键值对，代替之前记录这个键值对的多条命令。</p>
+<p>AOF重写程序在子进程中执行，这样做有两个好处：</p>
+<ul>
+<li>子进程重写期间，父进程可以处理命令请求</li>
+<li>子进程带有服务进程的数据副本，使用子进程而不是线程，可以避免使用锁的情况下，保证数据安全性</li>
+</ul>
+<p>在子进程重写期间，服务进程还需继续处理命令请求，新的命令可能会对现有的数据库状态进行修改，从而使得数据状态不一致。为了解决问这个问题，Redis服务器设置了一个AOF重写缓冲区，这个缓冲区在服务器创建子进程之后开始使用，当Redis服务器执行完一个写命令后，他会同事讲这个写命令发送到AOF缓冲区和AOF重写缓冲区。这样可以保证：</p>
+<ul>
+<li>AOF缓冲区的内容会定期被写入和同步到AOF文件</li>
+<li>从创建子进程开始，服务器执行的所有写命令都会记录到AOF重写缓冲区里面。</li>
+</ul>
+<p>当重写完成后，它会向父进程发送一个信号，父进程在接收到该信号之后，会调用一个信号处理函数，并执行以下工作：</p>
+<ul>
+<li>将AOF重写缓冲区中的所有内容写入新的AOF文件中</li>
+<li>对新的AOF文件进行改名，原子地覆盖现有的AOF文件，完成替换。</li>
+</ul>
+<h3 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>比RDB可靠。你可以制定不同的fsync策略：不进行fsync、每秒fsync一次和每次查询进行fsync。默认是每秒fsync一次。这意味着你最多丢失一秒钟的数据。</li>
+<li>AOF日志文件是一个纯追加的文件。就算是遇到突然停电的情况，也不会出现日志的定位或者损坏问题。甚至如果因为某些原因（例如磁盘满了）命令只写了一半到日志文件里，我们也可以用redis-check-aof这个工具很简单的进行修复。</li>
+<li>当AOF文件太大时，Redis会自动在后台进行重写。重写很安全，因为重写是在一个新的文件上进行，同时Redis会继续往旧的文件追加数据。新文件上会写入能重建当前数据集的最小操作命令的集合。当新文件重写完，Redis会把新旧文件进行切换，然后开始把数据写到新文件上。</li>
+<li>AOF把操作命令以简单易懂的格式一条接一条的保存在文件里，很容易导出来用于恢复数据。例如我们不小心用FLUSHALL命令把所有数据刷掉了，只要文件没有被重写，我们可以把服务停掉，把最后那条命令删掉，然后重启服务，这样就能把被刷掉的数据恢复回来。</li>
+</ul>
+<h3 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>在相同的数据集下，AOF文件的大小一般会比RDB文件大。</li>
+<li>在某些fsync策略下，AOF的速度会比RDB慢。通常fsync设置为每秒一次就能获得比较高的性能，而在禁止fsync的情况下速度可以达到RDB的水平。</li>
+<li>在过去曾经发现一些很罕见的BUG导致使用AOF重建的数据跟原数据不一致的问题。</li>
+</ul>
+</div><div class="tags"><a href="/tags/Redis/">Redis</a></div><div class="post-nav"><a class="pre" href="/2017/08/12/SQL和NoSQL/">SQL和NoSQL</a><a class="next" href="/2017/07/05/Redis-对象/">Redis-对象</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"><input type="hidden" name="sitesearch" value="http://localhost"></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java并发/">Java并发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术杂文/">技术杂文</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/机器学习/">机器学习</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活总结/">生活总结</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/计算机网络/">计算机网络</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/token/" style="font-size: 15px;">token</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Redis/" style="font-size: 15px;">Redis</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/JSON/" style="font-size: 15px;">JSON</a> <a href="/tags/SQL/" style="font-size: 15px;">SQL</a> <a href="/tags/NoSQL/" style="font-size: 15px;">NoSQL</a> <a href="/tags/Session/" style="font-size: 15px;">Session</a> <a href="/tags/Cookie/" style="font-size: 15px;">Cookie</a> <a href="/tags/volatile/" style="font-size: 15px;">volatile</a> <a href="/tags/ThreadLocal/" style="font-size: 15px;">ThreadLocal</a> <a href="/tags/中文分词/" style="font-size: 15px;">中文分词</a> <a href="/tags/NLP/" style="font-size: 15px;">NLP</a> <a href="/tags/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/NexT/" style="font-size: 15px;">NexT</a> <a href="/tags/梯度下降/" style="font-size: 15px;">梯度下降</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/动态代理/" style="font-size: 15px;">动态代理</a> <a href="/tags/面经/" style="font-size: 15px;">面经</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/05/27/2018中期学习计划/">2018中期学习计划</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/14/MySQL5-7-JSON调研报告/">MySQL5.7 JSON调研报告</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/11/Stanford-coreNLP学习笔记/">Stanford coreNLP学习笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/13/机器学习-梯度下降-学习笔记/">机器学习-梯度下降 学习笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/17/秋招面经-美团-有赞/">秋招面经-美团&有赞</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/22/浅谈动态代理/">浅谈动态代理</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/21/ThreadLocal原理及使用/">ThreadLocal原理及使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/17/Session、cookie、token概述/">Session、cookie、token概述</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/12/SQL和NoSQL/">SQL和NoSQL</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/05/Redis-持久化/">Redis-持久化</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Reveal The Essence..</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="GJW的个人博客"><title>SQL和NoSQL | Reveal The Essence.</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script><link rel="icon" mask sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">SQL和NoSQL</h1><a id="logo" href="/.">Reveal The Essence.</a><p class="description">保持信心, 正视自己, 持续努力.</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">SQL和NoSQL</h1><div class="post-meta">Aug 12, 2017<span> | </span><span class="category"><a href="/categories/数据库/">数据库</a></span></div><div class="post-content"><h3 id="SQL"><a href="#SQL" class="headerlink" title="SQL"></a>SQL</h3><p>结构化查询语言（英语：Structured Query Language，缩写：SQL），是一种特殊目的的编程语言，用于数据库中的标准数据查询语言，是一种基于关系型数据库的语言。关系型数据库是创建在关系模型上的数据库。</p>
+<p>关系型数据库代表：SQL Server、Oracle数据库、MySQL。</p>
+<p>简单来说，关系模型指的就是二维表格模型，而一个关系型数据库就是由二维表及其之间的联系所组成的一个数据组织。</p>
+<h4 id="关系模型中常用的概念："><a href="#关系模型中常用的概念：" class="headerlink" title="关系模型中常用的概念："></a>关系模型中常用的概念：</h4><ul>
+<li><p>关系：可以理解为一张二维表，每个关系都具有一个关系名，就是通常说的表名</p>
+</li>
+<li><p>元组：可以理解为二维表中的一行，在数据库中经常被称为记录</p>
+</li>
+<li><p>属性：可以理解为二维表中的一列，在数据库中经常被称为字段</p>
+</li>
+<li><p>域：属性的取值范围，也就是数据库中某一列的取值限制</p>
+</li>
+<li><p>关键字：一组可以唯一标识元组的属性，数据库中常称为主键，由一个或多个列组成</p>
+</li>
+<li><p>关系模式：指对关系的描述。其格式为：关系名(属性1，属性2， … … ，属性N)，在数据库中成为表结构</p>
+</li>
+</ul>
+<h4 id="关系数据库优点："><a href="#关系数据库优点：" class="headerlink" title="关系数据库优点："></a>关系数据库优点：</h4><ul>
+<li><p>容易理解：二维表结构是非常贴近逻辑世界的一个概念，关系模型相对网状、层次等其他模型来说更容易理解</p>
+</li>
+<li><p>使用方便：通用的SQL语言使得操作关系型数据库非常方便</p>
+</li>
+<li><p>易于维护：丰富的完整性(实体完整性、参照完整性和用户定义的完整性)大大减低了数据冗余和数据不一致的概率</p>
+</li>
+</ul>
+<h4 id="关系型数据库瓶颈："><a href="#关系型数据库瓶颈：" class="headerlink" title="关系型数据库瓶颈："></a>关系型数据库瓶颈：</h4><ul>
+<li><p>高并发读写需求<br>  网站的用户并发性非常高，往往达到每秒上万次读写请求，对于传统关系型数据库来说，硬盘I/O是一个很大的瓶颈</p>
+</li>
+<li><p>海量数据的高效率读写<br>  网站每天产生的数据量是巨大的，对于关系型数据库来说，在一张包含海量数据的表中查询，效率是非常低的</p>
+</li>
+<li><p>高扩展性和可用性<br>  在基于web的结构当中，数据库是最难进行横向扩展的，当一个应用系统的用户量和访问量与日俱增的时候，数据库却没有办法像web server和app server那样简单的通过添加更多的硬件和服务节点来扩展性能和负载能力。对于很多需要提供24小时不间断服务的网站来说，对数据库系统进行升级和扩展 是非常痛苦的事情，往往需要停机维护和数据迁移。</p>
+</li>
+<li><p>对网站而言很多特性不再需要：</p>
+<ul>
+<li><p>事务一致性<br>关系型数据库在对事物一致性的维护中有很大的开销，而现在很多web2.0系统对事物的读写一致性都不高</p>
+</li>
+<li><p>读写实时性<br>对关系数据库来说，插入一条数据之后立刻查询，是肯定可以读出这条数据的，但是对于很多web应用来说，并不要求这么高的实时性，比如发一条消息之后，过几秒乃至十几秒之后才看到这条动态是完全可以接受的</p>
+</li>
+<li><p>复杂SQL，特别是多表关联查询<br>任何大数据量的web系统，都非常忌讳多个大表的关联查询，以及复杂的数据分析类型的复杂SQL报表查询，特别是SNS类型的网站，从需求以及产品阶级角度，就避免了这种情况的产生。往往更多的只是单表的主键查询，以及单表的简单条件分页查询，SQL的功能极大的弱化了</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>在关系型数据库中，导致性能欠佳的最主要原因是多表的关联查询，以及复杂的数据分析类型的复杂SQL报表查询。为了保证数据库的ACID特性，我们 必须尽量按照其要求的范式进行设计，关系型数据库中的表都是存储一个格式化的数据结构。每个元组字段的组成都是一样，即使不是每个元组都需要所有的字段， 但数据库会为每个元组分配所有的字段，这样的结构可以便于标语表之间进行链接等操作，但从另一个角度来说它也是关系型数据库性能瓶颈的一个因素。</p>
+<h3 id="NoSQL"><a href="#NoSQL" class="headerlink" title="NoSQL"></a>NoSQL</h3><p>NoSQL泛指非关系型的数据库，强调Key-Value存储，结构不固定。</p>
+<p>非关系型数据库提出另一种理念，例如，以键值对存储，且结构不固定，每一个元组可以有不一样的字段，每个元组可以根据需要增加一些自己的键值对，这 样就不会局限于固定的结构，可以减少一些时间和空间的开销。使用这种方式，用户可以根据需要去添加自己需要的字段，这样，为了获取用户的不同信息，不需要 像关系型数据库中，要对多表进行关联查询。仅需要根据id取出相应的value就可以完成查询。但非关系型数据库由于很少的约束，他也不能够提供像SQL 所提供的where这种对于字段属性值情况的查询。并且难以体现设计的完整性。他只适合存储一些较为简单的数据，对于需要进行较复杂查询的数据，SQL数 据库显的更为合适。</p>
+<p>非关系型数据库因为其使用K-V存储，所以具有极高的并发读写能力；由于没有固定的结构，所以扩展性强，不需要进行多表查询；同时现在网站很多对事务一致性要求不高，所以可以使用NoSQL数据库存储一些简单的数据，从而提高网站的可用性。</p>
+<p>非关系型数据库的数据耦合性弱，可以随时删除任何数据；关系型数据库则要满足数据的一致性，删除数据时有限制。</p>
+</div><div class="tags"><a href="/tags/SQL/">SQL</a><a href="/tags/NoSQL/">NoSQL</a></div><div class="post-nav"><a class="pre" href="/2017/08/17/Session、cookie、token概述/">Session、cookie、token概述</a><a class="next" href="/2017/07/05/Redis-持久化/">Redis-持久化</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"><input type="hidden" name="sitesearch" value="http://localhost"></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java并发/">Java并发</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术杂文/">技术杂文</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/机器学习/">机器学习</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活总结/">生活总结</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/计算机网络/">计算机网络</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/token/" style="font-size: 15px;">token</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Redis/" style="font-size: 15px;">Redis</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/JSON/" style="font-size: 15px;">JSON</a> <a href="/tags/SQL/" style="font-size: 15px;">SQL</a> <a href="/tags/NoSQL/" style="font-size: 15px;">NoSQL</a> <a href="/tags/Session/" style="font-size: 15px;">Session</a> <a href="/tags/Cookie/" style="font-size: 15px;">Cookie</a> <a href="/tags/volatile/" style="font-size: 15px;">volatile</a> <a href="/tags/ThreadLocal/" style="font-size: 15px;">ThreadLocal</a> <a href="/tags/中文分词/" style="font-size: 15px;">中文分词</a> <a href="/tags/NLP/" style="font-size: 15px;">NLP</a> <a href="/tags/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/NexT/" style="font-size: 15px;">NexT</a> <a href="/tags/梯度下降/" style="font-size: 15px;">梯度下降</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/动态代理/" style="font-size: 15px;">动态代理</a> <a href="/tags/面经/" style="font-size: 15px;">面经</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/05/27/2018中期学习计划/">2018中期学习计划</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/14/MySQL5-7-JSON调研报告/">MySQL5.7 JSON调研报告</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/11/Stanford-coreNLP学习笔记/">Stanford coreNLP学习笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/13/机器学习-梯度下降-学习笔记/">机器学习-梯度下降 学习笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/17/秋招面经-美团-有赞/">秋招面经-美团&有赞</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/22/浅谈动态代理/">浅谈动态代理</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/21/ThreadLocal原理及使用/">ThreadLocal原理及使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/17/Session、cookie、token概述/">Session、cookie、token概述</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/12/SQL和NoSQL/">SQL和NoSQL</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/05/Redis-持久化/">Redis-持久化</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://www.example1.com/" title="site-name1" target="_blank">site-name1</a><ul></ul><a href="http://www.example2.com/" title="site-name2" target="_blank">site-name2</a><ul></ul><a href="http://www.example3.com/" title="site-name3" target="_blank">site-name3</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Reveal The Essence..</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
