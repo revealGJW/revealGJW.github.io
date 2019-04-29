@@ -72,9 +72,9 @@
 <p>  这个定义上上面已经介绍过的基本一致，不同的是：它允许用户提供一个循环计算的初始值，如果Stream为空，就直接返回该值。而且这个方法不会返回Optional，因为其不会出现null值。下面直接给出例子，就不再做说明了。</p>
   <figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; ints = Lists.newArrayList(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>);</span><br><span class="line">System.out.println(<span class="string">"ints sum is:"</span> + ints.stream().reduce(<span class="number">0</span>, (sum, item) -&gt; sum + item));</span><br></pre></td></tr></table></figure>
 </li>
-</ul>
-<p>– count方法：获取Stream中元素的个数。比较简单，这里就直接给出例子，不做解释了。<br>    <figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; ints = Lists.newArrayList(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>);</span><br><span class="line">System.out.println(<span class="string">"ints sum is:"</span> + ints.stream().count());</span><br></pre></td></tr></table></figure></p>
-<ul>
+<li><p>count方法：获取Stream中元素的个数。比较简单，这里就直接给出例子，不做解释了。</p>
+  <figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; ints = Lists.newArrayList(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>);</span><br><span class="line">System.out.println(<span class="string">"ints sum is:"</span> + ints.stream().count());</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>搜索相关</p>
 <ul>
 <li>allMatch：是不是Stream中的所有元素都满足给定的匹配条件</li>
